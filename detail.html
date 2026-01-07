@@ -79,7 +79,7 @@ const TAHUN = new Date().getFullYear();
 
 async function loadDetail(){
   try {
-    const res = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?action=kartu&id_warga=' + ID_WARGA + '&tahun=' + TAHUN);
+    const res = await fetch('https://script.google.com/macros/s/AKfycbxX15j_OLQVcsbJowFOj7gaTVxUuXK3S-r9o2AKDnJZbB4ty8vPoxFIcGGttmqGF3Ozkw/exec?action=kartu&id_warga=' + ID_WARGA + '&tahun=' + TAHUN);
     const data = await res.json();
     const item = data.pembayaran.find(d => Number(d.bulan) === BULAN);
     if(!item) return alert('Data pembayaran tidak ditemukan');
