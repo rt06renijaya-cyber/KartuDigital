@@ -72,11 +72,14 @@ const ID_WARGA = params.get('id_warga');
 const BULAN = parseInt(params.get('bulan'));
 const TAHUN = new Date().getFullYear();
 
+// Ganti dengan URL Web App Apps Script final
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxX15j_OLQVcsbJowFOj7gaTVxUuXK3S-r9o2AKDnJZbB4ty8vPoxFIcGGttmqGF3Ozkw/exec';
+
 async function loadDetail(){
   try{
-    const res = await fetch('https://script.google.com/macros/s/AKfycbxX15j_OLQVcsbJowFOj7gaTVxUuXK3S-r9o2AKDnJZbB4ty8vPoxFIcGGttmqGF3Ozkw/exec?action=kartu&id_warga='+ID_WARGA+'&tahun='+TAHUN);
+    const res = await fetch(`${SCRIPT_URL}?action=kartu&id_warga=${ID_WARGA}&tahun=${TAHUN}`);
     const data = await res.json();
-    const item = data.pembayaran.find(d => Number(d.bulan)===BULAN);
+    const item = data.pembayaran.find(d=>Number(d.bulan)===BULAN);
     if(!item) return alert('Data pembayaran tidak ditemukan');
 
     document.getElementById('namaWarga').textContent = data.warga.nama;
@@ -87,7 +90,7 @@ async function loadDetail(){
     document.getElementById('statusBayar').textContent = item.nominal>0?'LUNAS':'BELUM';
     document.getElementById('kolektorBayar').textContent = item.idKolektor || '-';
 
-    // ✅ TTD asli muncul
+    // ✅ TTD asli
     document.getElementById('ttdWarga').src = item.ttdWarga || '';
     document.getElementById('ttdKolektor').src = item.ttdKolektor || '';
   }catch(err){
