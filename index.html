@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kartu Iuran Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green-dark:#0f3d2e;
+  --green:#1f5c45;
+  --blue:#2f6fa5;
+  --bg:#f4f7f6;
+  --card:#fff;
+  --border:#e3e7e5;
+  --success:#2e7d32;
+  --danger:#c62828;
+}
+*{box-sizing:border-box;font-family:'Inter',sans-serif;}
+body{margin:0;background:var(--bg);padding:16px;}
+.card{max-width:420px;margin:auto;background:var(--card);border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);overflow:hidden;}
+.header{background:linear-gradient(135deg,var(--green-dark),var(--green));color:#fff;padding:20px;text-align:center;}
+.header img{width:90px;height:90px;margin-bottom:10px;}
+.header h1{font-size:16px;margin:0;font-weight:600;letter-spacing:.5px;}
+.header p{margin:4px 0 0;font-size:13px;opacity:.9;}
+.info{padding:16px;border-bottom:1px solid var(--border);}
+.info-row{display:flex;justify-content:space-between;margin-bottom:8px;font-size:14px;}
+.info-row span{color:#666;}
+.info-row strong{color:#111;font-weight:600;}
+.table{width:100%;border-collapse:collapse;font-size:14px;}
+.table th{background:#f0f4f3;color:#333;text-align:left;padding:10px 14px;font-weight:600;}
+.table td{padding:12px 14px;border-bottom:1px solid var(--border);}
+.status{font-weight:600;font-size:13px;}
+.lunas{color:var(--success);}
+.belum{color:var(--danger);}
+.detail-btn{font-size:13px;color:var(--blue);text-decoration:none;font-weight:600;cursor:pointer;}
+.footer{padding:14px;text-align:center;font-size:12px;color:#777;background:#fafafa;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="header">
+    <img src="1767412017311.png" alt="Logo RT">
+    <h1>KARTU IURAN DIGITAL</h1>
+    <p>Rukun Tetangga 06 – Reni Jaya</p>
+  </div>
+
+  <div class="info" id="infoWarga">
+    <div class="info-row"><span>Nama Warga</span><strong id="namaWarga">...</strong></div>
+    <div class="info-row"><span>Gang</span><strong id="gangWarga">...</strong></div>
+    <div class="info-row"><span>No Rumah</span><strong id="rumahWarga">...</strong></div>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr><th>Bulan</th><th>Status</th><th></th></tr>
+    </thead>
+    <tbody id="tbodyIuran">
+      <tr><td colspan="3" style="text-align:center;">Memuat data...</td></tr>
+    </tbody>
+  </table>
+
+  <div class="footer">Sistem Iuran Warga Digital<br>Transparan • Aman • Tertib</div>
+</div>
+
+<script>
+const ID_WARGA = 'W003';
+const TAHUN = new Date().getFullYear();
+const namaBulan = ['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+async function loadKartu() {
+  try {
+    const res = await fetch('https://script.google.com/macros/s/AKfycbxX15j_OLQVcsbJowFOj7gaTVxUuXK3S-r9o2AKDnJZbB4ty8vPoxFIcGGttmqGF3Ozkw/exec'
+      + `?action=kartu&id_warga=${ID_WARGA}&tahun=${TAHUN}`);
+    const data = await res.json();
+
+    document.getElementById('namaWarga').textContent = data.warga.nama;
+    document.getElementById('gangWarga').textContent = data.warga.gang;
+    document.getElementById('rumahWarga').textContent = data.warga.rumah;
+
+    const tbody = document.getElementById('tbodyIuran');
+    tbody.innerHTML = '';
+
+    data.pembayaran.forEach(d => {
+      const status = d.nominal>0?'LUNAS':'BELUM';
+      const statusClass = d.nominal>0?'lunas':'belum';
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${namaBulan[d.bulan-1]} ${TAHUN}</td>
+        <td class="status ${statusClass}">${status}</td>
+        <td>${d.nominal>0?`<a class="detail-btn" href="detail.html?id_warga=${ID_WARGA}&bulan=${d.bulan}">Detail</a>`:'-'}</td>`;
+      tbody.appendChild(tr);
+    });
+  } catch(err){
+    console.error(err);
+    document.getElementById('tbodyIuran').innerHTML = '<tr><td colspan="3" style="text-align:center;color:red;">Gagal memuat data</td></tr>';
+  }
+}
+
+loadKartu();
+</script>
+</body>
+</html>
