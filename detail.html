@@ -1,4 +1,3 @@
-<!-- detail.html -->
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -9,27 +8,29 @@
 body{font-family:sans-serif;background:#f4f7f6;padding:16px;}
 .card{max-width:420px;margin:auto;background:#fff;border-radius:16px;box-shadow:0 10px 30px rgba(0,0,0,.08);overflow:hidden;}
 .header{background:linear-gradient(135deg,#0f3d2e,#1f5c45);color:#fff;padding:20px;text-align:center;}
-.header img{width:80px;margin-bottom:8px;}
 .header h1{margin:0;font-size:16px;}
+.header img{width:80px;margin-bottom:8px;}
 .section{padding:16px;border-bottom:1px solid #e3e7e5;}
 .row{display:flex;justify-content:space-between;margin-bottom:10px;font-size:14px;}
+.row span{color:#666;}
+.row strong{font-weight:600;color:#111;}
 .status{display:inline-block;padding:6px 12px;background:#e8f5e9;color:#2e7d32;font-weight:700;border-radius:20px;font-size:12px;}
 .ttd-container{display:flex;gap:12px;margin-top:12px;}
 .ttd-box{flex:1;border:1px dashed #e3e7e5;border-radius:12px;padding:10px;text-align:center;}
 .ttd-box img{width:100%;max-height:120px;object-fit:contain;}
 .ttd-label{font-size:12px;color:#555;margin-top:6px;font-weight:600;}
-.ttd-placeholder{font-size:12px;color:#999;margin-top:6px;font-style:italic;}
 .back{display:block;margin-top:8px;font-size:13px;text-decoration:none;color:#2f6fa5;font-weight:600;}
+.footer{padding:14px;text-align:center;font-size:12px;color:#777;background:#fafafa;}
 </style>
 </head>
 <body>
 
 <div class="card">
-
   <!-- HEADER -->
   <div class="header">
     <img src="1767412017311.png" alt="Logo RT">
     <h1>Detail Pembayaran Iuran</h1>
+    <p>Rukun Tetangga 06 – Reni Jaya</p>
   </div>
 
   <!-- INFO WARGA -->
@@ -52,75 +53,50 @@ body{font-family:sans-serif;background:#f4f7f6;padding:16px;}
     <strong>Tanda Tangan</strong>
     <div class="ttd-container">
       <div class="ttd-box">
-        <img id="ttdWarga" style="display:none;">
+        <img id="ttdWarga" src="" alt="TTD Warga">
         <div class="ttd-label">Warga</div>
-        <div id="ttdWargaPlaceholder" class="ttd-placeholder">Belum ada TTD</div>
       </div>
       <div class="ttd-box">
-        <img id="ttdKolektor" style="display:none;">
+        <img id="ttdKolektor" src="" alt="TTD Kolektor">
         <div class="ttd-label">Kolektor</div>
-        <div id="ttdKolektorPlaceholder" class="ttd-placeholder">Belum ada TTD</div>
       </div>
     </div>
     <a class="back" href="index.html">← Kembali ke Kartu Iuran</a>
   </div>
 
+  <!-- FOOTER -->
+  <div class="footer">
+    Bukti pembayaran digital ini sah<br>
+    Disimpan otomatis oleh sistem
+  </div>
 </div>
 
 <script>
-// Ambil parameter dari URL
 const params = new URLSearchParams(window.location.search);
 const ID_WARGA = params.get('id_warga');
 const BULAN = parseInt(params.get('bulan'));
 const TAHUN = new Date().getFullYear();
 
-// Fungsi load detail
 async function loadDetail(){
   try {
-    // Ganti YOUR_SCRIPT_ID dengan Web Apps deployment ID
-    const res = await fetch(
-      'https://script.google.com/macros/s/AKfycbxX15j_OLQVcsbJowFOj7gaTVxUuXK3S-r9o2AKDnJZbB4ty8vPoxFIcGGttmqGF3Ozkw/exec?action=kartu&id_warga='
-      + ID_WARGA + '&tahun=' + TAHUN
-    );
-    if(!res.ok) throw new Error('Fetch gagal, cek URL dan akses Web Apps');
-
+    const res = await fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec?action=kartu&id_warga=' + ID_WARGA + '&tahun=' + TAHUN);
     const data = await res.json();
-    if(!data || !data.pembayaran) return alert('Data pembayaran tidak ditemukan');
-
     const item = data.pembayaran.find(d => Number(d.bulan) === BULAN);
     if(!item) return alert('Data pembayaran tidak ditemukan');
 
-    // --- INFO WARGA ---
-    document.getElementById('namaWarga').textContent = data.warga.nama || '-';
-    document.getElementById('gangRumah').textContent = (data.warga.gang || '-') + ' / ' + (data.warga.rumah || '-');
+    document.getElementById('namaWarga').textContent = data.warga.nama;
+    document.getElementById('gangRumah').textContent = data.warga.gang + ' / ' + data.warga.rumah;
     document.getElementById('bulanIuran').textContent = BULAN + ' / ' + TAHUN;
-
-    // --- INFO PEMBAYARAN ---
     document.getElementById('tanggalBayar').textContent = item.tanggal ? new Date(item.tanggal).toLocaleDateString('id-ID') : '-';
-    document.getElementById('nominalBayar').textContent = 'Rp ' + Number(item.nominal || 0).toLocaleString('id-ID');
+    document.getElementById('nominalBayar').textContent = 'Rp ' + Number(item.nominal).toLocaleString('id-ID');
     document.getElementById('statusBayar').textContent = item.nominal>0?'LUNAS':'BELUM';
     document.getElementById('kolektorBayar').textContent = item.idKolektor || '-';
 
-    // --- TTD ---
-    const ttdWargaImg = document.getElementById('ttdWarga');
-    const ttdKolektorImg = document.getElementById('ttdKolektor');
-    const ttdWargaPlaceholder = document.getElementById('ttdWargaPlaceholder');
-    const ttdKolektorPlaceholder = document.getElementById('ttdKolektorPlaceholder');
-
-    if(item.ttdWarga){
-      ttdWargaImg.src = item.ttdWarga;
-      ttdWargaImg.style.display = 'block';
-      ttdWargaPlaceholder.style.display = 'none';
-    }
-    if(item.ttdKolektor){
-      ttdKolektorImg.src = item.ttdKolektor;
-      ttdKolektorImg.style.display = 'block';
-      ttdKolektorPlaceholder.style.display = 'none';
-    }
-
+    // ✅ TTD asli
+    document.getElementById('ttdWarga').src = item.ttdWarga || '';
+    document.getElementById('ttdKolektor').src = item.ttdKolektor || '';
   } catch(err){
-    console.error(err);
-    alert('Gagal memuat data: '+err.message);
+    alert('Gagal memuat data: ' + err);
   }
 }
 
