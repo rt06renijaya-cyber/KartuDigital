@@ -26,21 +26,18 @@ body{font-family:sans-serif;background:#f4f7f6;padding:16px;}
 <body>
 
 <div class="card">
-  <!-- HEADER -->
   <div class="header">
     <img src="1767412017311.png" alt="Logo RT">
     <h1>Detail Pembayaran Iuran</h1>
     <p>Rukun Tetangga 06 – Reni Jaya</p>
   </div>
 
-  <!-- INFO WARGA -->
   <div class="section">
     <div class="row"><span>Nama Warga</span><strong id="namaWarga">...</strong></div>
     <div class="row"><span>Gang / Rumah</span><strong id="gangRumah">...</strong></div>
     <div class="row"><span>Bulan Iuran</span><strong id="bulanIuran">...</strong></div>
   </div>
 
-  <!-- INFO PEMBAYARAN -->
   <div class="section">
     <div class="row"><span>Tanggal Bayar</span><strong id="tanggalBayar">...</strong></div>
     <div class="row"><span>Nominal</span><strong id="nominalBayar">...</strong></div>
@@ -48,7 +45,6 @@ body{font-family:sans-serif;background:#f4f7f6;padding:16px;}
     <div class="row"><span>Kolektor</span><strong id="kolektorBayar">...</strong></div>
   </div>
 
-  <!-- TANDA TANGAN -->
   <div class="section">
     <strong>Tanda Tangan</strong>
     <div class="ttd-container">
@@ -64,7 +60,6 @@ body{font-family:sans-serif;background:#f4f7f6;padding:16px;}
     <a class="back" href="index.html">← Kembali ke Kartu Iuran</a>
   </div>
 
-  <!-- FOOTER -->
   <div class="footer">
     Bukti pembayaran digital ini sah<br>
     Disimpan otomatis oleh sistem
@@ -78,10 +73,10 @@ const BULAN = parseInt(params.get('bulan'));
 const TAHUN = new Date().getFullYear();
 
 async function loadDetail(){
-  try {
-    const res = await fetch('https://script.google.com/macros/s/AKfycbxX15j_OLQVcsbJowFOj7gaTVxUuXK3S-r9o2AKDnJZbB4ty8vPoxFIcGGttmqGF3Ozkw/exec?action=kartu&id_warga=' + ID_WARGA + '&tahun=' + TAHUN);
+  try{
+    const res = await fetch('https://script.google.com/macros/s/AKfycbxX15j_OLQVcsbJowFOj7gaTVxUuXK3S-r9o2AKDnJZbB4ty8vPoxFIcGGttmqGF3Ozkw/exec?action=kartu&id_warga='+ID_WARGA+'&tahun='+TAHUN);
     const data = await res.json();
-    const item = data.pembayaran.find(d => Number(d.bulan) === BULAN);
+    const item = data.pembayaran.find(d => Number(d.bulan)===BULAN);
     if(!item) return alert('Data pembayaran tidak ditemukan');
 
     document.getElementById('namaWarga').textContent = data.warga.nama;
@@ -92,11 +87,11 @@ async function loadDetail(){
     document.getElementById('statusBayar').textContent = item.nominal>0?'LUNAS':'BELUM';
     document.getElementById('kolektorBayar').textContent = item.idKolektor || '-';
 
-    // ✅ TTD asli
+    // ✅ TTD asli muncul
     document.getElementById('ttdWarga').src = item.ttdWarga || '';
     document.getElementById('ttdKolektor').src = item.ttdKolektor || '';
-  } catch(err){
-    alert('Gagal memuat data: ' + err);
+  }catch(err){
+    alert('Gagal memuat data: '+err);
   }
 }
 
